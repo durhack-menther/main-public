@@ -11,6 +11,8 @@ from tqdm import tqdm
 
 embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['OPENAI_API_KEY'])
 
+mentors_data = [{"name": "Anita Doe", "work experiences": "Data Science; Analytics; Technology; Education; Consulting"}]
+
 sum_mentors = [""" Here is the summary of the CV:
     The person's academic or research background is in Data Science; Technology.
     The person's field of study can be categorized as Computer Science.
@@ -28,7 +30,7 @@ How I Can Help: If you’re struggling with specific subjects or assignments, we
 mbti_mentors = ["ENFJ"]
 
 def read_pdf(filename):
-    reader = PyPDF2.PdfReader(f'{filename}.pdf')
+    reader = PyPDF2.PdfReader(filename)
     cv_docs = ""
     for i in range(len(reader.pages)):
         cv_docs += reader.pages[i].extract_text()
@@ -88,7 +90,7 @@ def analyse_cv(cv_docs):
     The person's technical or hard skills included: {responses[4]}.
     The person's soft skills included: {responses[5]}.
     """
-    return final_response
+    return final_response, responses
 
 cv_criteria = """
 RULES/CRITERIA:

@@ -1,21 +1,24 @@
 import streamlit as st
 import module.matchmaker as mm
 
+if 'key' not in st.session_state:
+    st.session_state['scores'] = []
+
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
 st.page_link("main_page.py", label = "< Home")
 st.title('Ready to meet your Mentor?')
 with st.form("my_form"):
     name_val = st.text_input("Name")
-    challenges_val = st.text_area("What challenges are you currently facing?")
+    challenges_val = st.text_area("What challenges are you currently facing?", placeholder="Enter 50 words to get +1000XP")
     purpose_option_val = st.selectbox(
     "For what purpose do you require a mentor?",
     ("Academic/Study", "Business Advisor", "Work-related", "Social & Lifestyle"),
     index=None,
     placeholder = "Choose one option",
 )
-    aspiration_val = st.text_area("What do you want to achieve through the mentoring? What are your goals?")
-    dream_val = st.text_area("Do you have any long-term goals? What is your ultimate dream?")
+    aspiration_val = st.text_area("What do you want to achieve through the mentoring? What are your goals?", placeholder="Enter 50 words to get +1000XP")
+    dream_val = st.text_area("Do you have any long-term goals? What is your ultimate dream?", placeholder="Enter 50 words to get +1000XP")
     mbti_val = st.selectbox(
     "What is Your MBTI?",
     ("ENFJ", "ENFP", "ENTP", "ENTJ", "ESFJ", "ESFP", "ESTP", "ESTJ",
@@ -23,16 +26,21 @@ with st.form("my_form"):
     index=None,
     placeholder = "Choose one option",)
 
+    mentor_style_val = st.multiselect(
+    "What type or style of mentor do you prefer?",
+    ["Supportive", "Strict", "Good Listener", "Hands-On", "Direct", "Goal-Oriented", "Patient", "Creative", "Flexible"],
+)
+
     cv_val = st.file_uploader("Upload your CV")
 
     # Every form must have a submit button.
     submitted = st.form_submit_button("Submit")
     if submitted:
-        cv_mentee = mm.read_pdf(cv_val)
+        cv_mentee = mm.read_pdf('dummy-data/CV2024_DivanyHarryndira_DS.pdf')
         sum_cv_mentee = mm.analyse_cv(cv_mentee)
         cv_compare_score = []
         for sum_cv_mentor in mm.sum_mentors:
-            cv_compare_score.append(mm.compare_cv(sum_cv_mentor, sum_cv_mentee, mm.cv_criteria))
+            cv_compare_score.append(mm.compare_cv(sum_cv_mentor, sum_cv_mentee[0], mm.cv_criteria))
         
         problem_goal = f"""
 {mm.mentee_questions[0]}
@@ -58,5 +66,6 @@ Answer: {dream_val}
         for i in range(len(mbti_score)):
             scores.append(mm.count_score(cv_compare_score[i], pg_compare_score[i], mbti_score[i]))
 
-        print(scores)
+        st.session_state.scores = scores
+        st.switch_page("pages/mentor_list.py")
 
